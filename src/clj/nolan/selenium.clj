@@ -33,7 +33,9 @@
 
 (defcommand open (.open target))
 (defcommand click (.click target))
-(defcommand clickAndWait (.click target) (.waitForPageToLoad "10000"))
+(defcommand clickAndWait
+  (.click target)
+  (.waitForPageToLoad "10000"))
 
 (defn parse-commands [html-file]
   (map
@@ -45,7 +47,8 @@
                   (zf/xml-> :body :table :tbody :tr :td zf/text)))))
 
 (defn run-commands [web-driver commands]
-  (let [web-backed-selenium-driver (WebDriverBackedSelenium. web-driver "")]
+  (let [web-backed-selenium-driver
+        (WebDriverBackedSelenium. web-driver "")]
     (doseq [c commands]
       (do-command web-backed-selenium-driver c))))
 

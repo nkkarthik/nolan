@@ -2,12 +2,22 @@
 
 Create movie file from Selenium html script
 
+## Requirements
+
+- Java 1.6
+- [Leiningen](https://github.com/technomancy/leiningen/blob/master/README.md)
+- Firefox
+
+## Limitations
+
+- Supports only 3 selenium commands (working on this)
+- Firefox only
+- Records the whole screen instead of just the browser window
+
 ## Usage
 
 To try, a *test.html* selenium script is present. With the below, the
 script is run and a movie file is created in *test.mov*.
-
-If you don't have `lein` [install Leiningen](https://github.com/technomancy/leiningen/blob/master/README.md)
 
 1. Open the terminal
 2. `$ lein repl`
