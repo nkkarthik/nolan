@@ -8,7 +8,8 @@
 
 ;; Unless required by applicable law or agreed to in writing, software
 ;; distributed under the License is distributed on an "AS IS" BASIS,
-;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+;; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+;; implied.
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 
@@ -19,23 +20,36 @@
   (import [org.openqa.selenium.firefox FirefoxDriver]
           [org.openqa.selenium WebDriverBackedSelenium]))
 
-(defmulti do-command
-  (fn [driver command] (:command command)))
+(def page-wait-millis "10000")
 
-(defmacro defcommand [command & body]
-  `(defmethod do-command ~(str command)
-     [driver# command#]
-     (let [~'target (:target command#)
-           ~'value (:value command#)]
-       (doto driver#
-         ~@body)
-       (Thread/sleep 1000))))
+(defn- and-wait? [command]
+  (.endsWith command "AndWait"))
 
-(defcommand open (.open target))
-(defcommand click (.click target))
-(defcommand clickAndWait
-  (.click target)
-  (.waitForPageToLoad "10000"))
+(defn- strip-and-wait [command]
+  (if (and-wait? command)
+    (.substring command 0 (- (count command) (count "AndWait")))
+    command))
+
+(defn- method-for [driver command]
+  (first (filter #(= command (.getName %))
+                 (.getMethods (.getClass driver)))))
+
+(defn- arg-count [method]
+  (count (.getParameterTypes method)))
+
+(defn- run-command [driver command]
+  (let [command-method
+        (method-for driver
+                    (strip-and-wait (:command command)))]
+    (.invoke command-method
+             driver
+             (object-array
+              (case (arg-count command-method)
+                0 nil
+                1 [(:target command)]
+                2 [(:target command) (:value command)]))))
+  (when (and-wait? (:command command))
+    (.waitForPageToLoad driver page-wait-millis)))
 
 (defn parse-commands [html-file]
   (map
@@ -50,11 +64,10 @@
   (let [web-backed-selenium-driver
         (WebDriverBackedSelenium. web-driver "")]
     (doseq [c commands]
-      (do-command web-backed-selenium-driver c))))
+      (run-command web-backed-selenium-driver c))))
 
 (defmacro with-firefox-driver [driver-name & body]
   `(let [~driver-name (FirefoxDriver.)]
      (try
        ~@body
        (finally (.close ~driver-name)))))
-
