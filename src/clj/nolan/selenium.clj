@@ -14,7 +14,8 @@
 ;; limitations under the License.
 
 (ns nolan.selenium
-  (require [clojure.xml :as xml]
+  (require [nolan.xml]
+           [clojure.xml :as xml]
            [clojure.zip :as zip]
            [clojure.contrib.zip-filter.xml :as zf])
   (import [org.openqa.selenium.firefox FirefoxDriver]
@@ -56,7 +57,7 @@
    (partial zipmap [:command :target :value])
    (partition 3
               (-> (java.io.File. html-file)
-                  (xml/parse)
+                  (xml/parse nolan.xml/non-validating-sax)
                   (zip/xml-zip)
                   (zf/xml-> :body :table :tbody :tr :td zf/text)))))
 

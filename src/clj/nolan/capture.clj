@@ -13,6 +13,8 @@
 ;; limitations under the License.
 
 (ns nolan.capture
+  (require [nolan.mouse :as mouse]
+           [nolan.image :as image])
   (import [nolan MovieWriter MovieDataSource]
           [java.awt Robot Dimension Rectangle Toolkit]
           [javax.media Format]
@@ -33,9 +35,19 @@
 (defn- take-screen-shot [robot size]
   (.createScreenCapture robot size))
 
+(defn- transform [transformations img]
+  (image/with-graphics [g img]
+    (doseq [t transformations]
+      (t g)))
+  img)
+
+(defn- transformations []
+  [(partial mouse/draw (mouse/cursor-image))])
+
 (defn record [movie-file]
   (let [size (screen-size)
-        screen-shot (partial take-screen-shot (Robot.) size)
+        screen-shot (comp (partial transform (transformations))
+                          (partial take-screen-shot (Robot.) size))
         done? (atom false)
         writer (future
                  (.write (MovieWriter.)
@@ -45,8 +57,8 @@
                           (take-while (fn [x] (not @done?))
                                       (repeatedly screen-shot)))))]
     (fn [cmd]
-        (cond (= cmd :stop) (do (reset! done? true) @writer)
-              :else (println "unknown command: " cmd)))))
+      (cond (= cmd :stop) (do (reset! done? true) @writer)
+            :else (println "unknown command: " cmd)))))
 
 (defn stop [recorder]
   (recorder :stop))

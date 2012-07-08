@@ -8,6 +8,7 @@
   
   :source-path "src/clj"
   :java-source-path "src/java"
+  :resources-path "src/resources"
 
   :main nolan.core
   :repl-init nolan.core
