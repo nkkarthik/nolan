@@ -21,25 +21,19 @@ import javax.media.format.VideoFormat;
 import javax.media.protocol.ContentDescriptor;
 import javax.media.protocol.PullBufferDataSource;
 import javax.media.protocol.PullBufferStream;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.util.Iterator;
 
 public class MovieDataSource extends PullBufferDataSource
         implements PullBufferStream {
 
     private final VideoFormat format;
-    private final ImageProvider images;
+    private final Iterator<RenderedImage> frames;
 
-    public MovieDataSource(ImageProvider images) {
-        this.images = images;
-
-        float frameRate = 5;
-        format = new VideoFormat(VideoFormat.JPEG,
-                                 new java.awt.Dimension(
-                                         images.getWidth(),
-                                         images.getHeight()),
-                                 Format.NOT_SPECIFIED,
-                                 Format.byteArray,
-                                 frameRate);
+    public MovieDataSource(VideoFormat format, Iterable<RenderedImage> reel) {
+        this.format = format;
+        this.frames = reel.iterator();
     }
 
     @Override
@@ -49,8 +43,8 @@ public class MovieDataSource extends PullBufferDataSource
 
     @Override
     public void read(Buffer buffer) throws IOException {
-        byte[] img = images.next();
-        if(img != null) {
+        if(frames.hasNext()) {
+            byte[] img = Image.toBytes(frames.next());
             buffer.setData(img);
             buffer.setOffset(0);
             buffer.setLength(img.length);

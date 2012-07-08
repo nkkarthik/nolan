@@ -13,18 +13,37 @@
 ;; limitations under the License.
 
 (ns nolan.capture
-  (import [nolan MovieWriter MovieDataSource
-           RobotScreenshotImageProvider]
-          [java.awt Robot]))
+  (import [nolan MovieWriter MovieDataSource]
+          [java.awt Robot Dimension Rectangle Toolkit]
+          [javax.media Format]
+          [javax.media.format VideoFormat]))
+
+(def frame-rate 5)
+
+(defn- jpeg-video-format [size]
+  (VideoFormat. VideoFormat/JPEG
+                (Dimension. (.width size) (.height size))
+                Format/NOT_SPECIFIED
+                Format/byteArray
+                frame-rate))
+
+(defn- screen-size []
+  (Rectangle. (-> (Toolkit/getDefaultToolkit) .getScreenSize)))
+
+(defn- take-screen-shot [robot size]
+  (.createScreenCapture robot size))
 
 (defn record [movie-file]
-  (let [done? (atom false)
+  (let [size (screen-size)
+        screen-shot (partial take-screen-shot (Robot.) size)
+        done? (atom false)
         writer (future
                  (.write (MovieWriter.)
                          movie-file
                          (MovieDataSource.
-                          (proxy [RobotScreenshotImageProvider] [(Robot.)]
-                            (done [] @done?)))))]
+                          (jpeg-video-format size)
+                          (take-while (fn [x] (not @done?))
+                                      (repeatedly screen-shot)))))]
     (fn [cmd]
         (cond (= cmd :stop) (do (reset! done? true) @writer)
               :else (println "unknown command: " cmd)))))

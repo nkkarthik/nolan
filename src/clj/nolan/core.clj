@@ -21,3 +21,6 @@
     (let [commands (selenium/parse-commands script-file)]
       (capture/with-recording-to movie-file
         (selenium/run-commands driver commands)))))
+
+(defn -main [& args]
+  (record-selenium-script "test.html" "test.mov"))

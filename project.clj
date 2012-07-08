@@ -9,6 +9,7 @@
   :source-path "src/clj"
   :java-source-path "src/java"
 
+  :main nolan.core
   :repl-init nolan.core
   
   ;; un-comment to enable remote debugging
