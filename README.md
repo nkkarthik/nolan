@@ -19,9 +19,9 @@ script is run and a movie file is created in *test.mov*.
 
 ## TODO
 
-- Record mouse pointer in the video (java does not capture pointer)
-- Add sub-title, given as comment in the script, to the video
 - Move mouse pointer before clicks
+- Can we record only browser window?
+- Add sub-title, given as comment in the script, to the video
 - Should be able to give a 'sub-title' as comment in the selenium
    script.  And it should be recorded in the video
 
