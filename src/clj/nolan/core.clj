@@ -17,10 +17,11 @@
            [nolan.selenium :as selenium]))
 
 (defn record-selenium-script [script-file movie-file]
-  (selenium/with-firefox-driver driver
-    (let [commands (selenium/parse-commands script-file)]
-      (capture/with-recording-to movie-file
-        (selenium/run-commands driver commands)))))
+  (selenium/with-firefox browser
+    (let [commands (selenium/parse-commands script-file)
+          screen-area (selenium/browser-area browser)]
+      (capture/with-recording-to movie-file screen-area
+        (selenium/run-commands browser commands)))))
 
 (defn -main [& args]
   (record-selenium-script "test.html" "test.mov"))

@@ -29,9 +29,6 @@
                 Format/byteArray
                 frame-rate))
 
-(defn- screen-size []
-  (Rectangle. (-> (Toolkit/getDefaultToolkit) .getScreenSize)))
-
 (defn- take-screen-shot [robot size]
   (.createScreenCapture robot size))
 
@@ -44,8 +41,8 @@
 (defn- transformations []
   [(partial mouse/draw (mouse/cursor-image))])
 
-(defn record [movie-file]
-  (let [size (screen-size)
+(defn record [movie-file screen-area]
+  (let [size screen-area
         screen-shot (comp (partial transform (transformations))
                           (partial take-screen-shot (Robot.) size))
         done? (atom false)
@@ -63,8 +60,8 @@
 (defn stop [recorder]
   (recorder :stop))
 
-(defmacro with-recording-to [movie-file & body]
-  `(let [recorder# (record ~movie-file)]
+(defmacro with-recording-to [movie-file screen-area & body]
+  `(let [recorder# (record ~movie-file ~screen-area)]
      (try
        ~@body
        (finally (stop recorder#)))))

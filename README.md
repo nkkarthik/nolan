@@ -20,7 +20,6 @@ script is run and a movie file is created in *test.mov*.
 ## TODO
 
 - Move mouse pointer before clicks
-- Can we record only browser window?
 - Add sub-title, given as comment in the script, to the video
 - Should be able to give a 'sub-title' as comment in the selenium
    script.  And it should be recorded in the video
@@ -28,7 +27,6 @@ script is run and a movie file is created in *test.mov*.
 ## Limitations
 
 - Firefox only
-- Records the whole screen instead of just the browser window
 
 ## License
 

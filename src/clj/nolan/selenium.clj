@@ -67,8 +67,17 @@
     (doseq [c commands]
       (run-command web-backed-selenium-driver c))))
 
-(defmacro with-firefox-driver [driver-name & body]
+(defn browser-area [browser]
+  "Returns a rectangle with left, top, width, height of the browser"
+  (let [wnd (-> browser .manage .window)
+        point (.getPosition wnd)
+        size (.getSize wnd)]
+    (java.awt.Rectangle. (.x point) (.y point)
+                         (.width size) (.height size))))
+
+(defmacro with-firefox [driver-name & body]
   `(let [~driver-name (FirefoxDriver.)]
      (try
        ~@body
        (finally (.close ~driver-name)))))
+
