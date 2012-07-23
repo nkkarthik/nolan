@@ -5,7 +5,7 @@ Create movie file from Selenium html script
 ## Requirements
 
 - Java 1.6
-- [Leiningen](https://github.com/technomancy/leiningen/blob/master/README.md)
+- [Leiningen 2](https://github.com/technomancy/leiningen/blob/master/README.md)
 - Firefox
 
 ## Usage
